@@ -1,4 +1,5 @@
 require('./models/user');
+require('./models/card');
 const express = require('express');
 const mongoose = require('mongoose');
 
