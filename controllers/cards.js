@@ -14,14 +14,24 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => res.send(card))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: err.message });
+      }
+      return res.status(500).send({ message: 'Ошибка сервера.' });
+    });
 };
 
 // delete card by id
 module.exports.deleteCard = (req, res) => {
   const { cardID } = req.params;
   Card.findByIdAndRemove({ cardID })
-    .then(() => res.send({ message: 'Карточка удалена' }))
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      }
+      return res.send({ message: 'Карточка удалена' });
+    })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
@@ -34,7 +44,12 @@ module.exports.likeCard = (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     )
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+      }
+      return res.send(card);
+    })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
@@ -47,6 +62,11 @@ module.exports.dislikeCard = (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     )
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+      }
+      return res.send(card);
+    })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
