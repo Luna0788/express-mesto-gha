@@ -32,7 +32,12 @@ module.exports.deleteCard = (req, res) => {
       }
       return res.send({ message: 'Карточка удалена' });
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: err.message });
+      }
+      return res.status(500).send({ message: 'Ошибка сервера.' });
+    });
 };
 
 // add likes
