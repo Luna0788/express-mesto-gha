@@ -25,7 +25,7 @@ module.exports.createCard = (req, res) => {
 // delete card by id
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove({ cardId })
+  Card.findByIdAndDelete(cardId)
     .then((card) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
@@ -51,7 +51,7 @@ module.exports.likeCard = (req, res) => {
       return res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: 'Ошибка сервера.' });
@@ -74,7 +74,7 @@ module.exports.dislikeCard = (req, res) => {
       return res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: 'Ошибка сервера.' });
