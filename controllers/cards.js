@@ -33,15 +33,14 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndDelete(cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-      }
-      return res.send({ message: 'Карточка удалена' });
-    })
+    .orFail(new Error('NotValidId'))
+    .then(() => res.send({ message: 'Карточка удалена' }))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(BAD_REQUEST_CODE).send({ message: err.message });
+      }
+      if (err.message === 'NotValidId') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
       }
       return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
     });
@@ -56,15 +55,14 @@ module.exports.likeCard = (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true, runValidators: true },
     )
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Передан несуществующий _id карточки.' });
-      }
-      return res.send(card);
-    })
+    .orFail(new Error('NotValidId'))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(BAD_REQUEST_CODE).send({ message: err.message });
+      }
+      if (err.message === 'NotValidId') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Передан несуществующий _id карточки.' });
       }
       return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
     });
@@ -79,15 +77,14 @@ module.exports.dislikeCard = (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true, runValidators: true },
     )
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Передан несуществующий _id карточки.' });
-      }
-      return res.send(card);
-    })
+    .orFail(new Error('NotValidId'))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(BAD_REQUEST_CODE).send({ message: err.message });
+      }
+      if (err.message === 'NotValidId') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Передан несуществующий _id карточки.' });
       }
       return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
     });

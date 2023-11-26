@@ -50,15 +50,14 @@ module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
   const userId = req.user._id;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true, upsert: false })
-    .then((user) => {
-      if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь по указанному _id не найден.' });
-      }
-      return res.send({ data: user });
-    })
+    .orFail(new Error('NotValidId'))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST_CODE).send({ message: err.message });
+      }
+      if (err.message === 'NotValidId') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
     });
@@ -69,15 +68,14 @@ module.exports.updateAvatar = (req, res) => {
   const userId = req.user._id;
   const { avatar } = req.body;
   User.findByIdAndUpdate(userId, { avatar }, { new: true })
-    .then((user) => {
-      if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь по указанному _id не найден.' });
-      }
-      return res.send({ data: user });
-    })
+    .orFail(new Error('NotValidId'))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST_CODE).send({ message: err.message });
+      }
+      if (err.message === 'NotValidId') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
     });
