@@ -1,7 +1,11 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/user');
 
 const {
   BAD_REQUEST_CODE,
+  UNAUTHORIZED_CODE,
   NOT_FOUND_CODE,
   INTERNAL_SERVER_ERROR_CODE,
   CREATED_CODE,
@@ -9,8 +13,22 @@ const {
 
 // create user
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
+
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => res.status(CREATED_CODE).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -79,4 +97,15 @@ module.exports.updateAvatar = (req, res) => {
       }
       return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
     });
+};
+
+// login
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => res.status(UNAUTHORIZED_CODE).send({ message: err.message }));
 };
