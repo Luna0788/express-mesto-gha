@@ -63,6 +63,24 @@ module.exports.getUser = (req, res) => {
     });
 };
 
+// get current user
+module.exports.getCurrentUser = (req, res) => {
+  const { userId } = req.user._id;
+
+  User.findById(userId)
+    .orFail(new Error('NotValidId'))
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(BAD_REQUEST_CODE).send({ message: err.message });
+      }
+      if (err.message === 'NotValidId') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Текущий пользователь не найден.' });
+      }
+      return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
+    });
+};
+
 // update user info
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
