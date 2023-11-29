@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
-const AuthError = require('../errors/AuthError');
+// const AuthError = require('../errors/AuthError');
 const ConflictError = require('../errors/ConflictError');
 
 const {
@@ -28,16 +28,20 @@ module.exports.createUser = (req, res, next) => {
     email,
     password: hash,
   }))
-    .then((user) => res.status(CREATED_CODE).send({ data: user }))
+    .then(() => res.status(CREATED_CODE).send({
+      data: {
+        name, about, avatar, email,
+      },
+    }))
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже существует'));
+        return next(new ConflictError('Пользователь с таким email уже существует'));
       }
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Некорректный id пользователя'));
+        return next(new BadRequestError('Некорректные данные пользователя'));
         // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
       }
-      next(err);
+      return next(err);
       // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
     });
 };
@@ -145,6 +149,5 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.send({ token });
     })
-    // .catch((err) => res.status(UNAUTHORIZED_CODE).send({ message: err.message }));
-    .catch(next(new AuthError()));
+    .catch(next);
 };

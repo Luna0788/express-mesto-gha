@@ -16,16 +16,6 @@ app.post('/signin', login);
 app.post('/signup', createUser);
 app.use(auth);
 
-// app.use(express.static(path.join(__dirname, 'public')));
-
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '6555e9e3ab95342e156ac11c',
-//   };
-
-//   next();
-// });
-
 app.use(router);
 
 app.use(error);
