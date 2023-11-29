@@ -21,14 +21,13 @@ module.exports.createUser = (req, res, next) => {
     password,
   } = req.body;
 
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
+  bcrypt.hash(password, 10).then((hash) => User.create({
+    name,
+    about,
+    avatar,
+    email,
+    password: hash,
+  }))
     .then((user) => res.status(CREATED_CODE).send({ data: user }))
     .catch((err) => {
       if (err.code === 11000) {
