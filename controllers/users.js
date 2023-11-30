@@ -55,15 +55,13 @@ module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .orFail(new Error('NotValidId'))
+    .orFail(() => new NotFoundError('Пользователь по указанному _id не найден.'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный id пользователя.'));
       }
-      if (err.message === 'NotValidId') {
-        next(new NotFoundError('Пользователь по указанному _id не найден.'));
-      }
+
       next(err);
     });
 };
@@ -72,15 +70,13 @@ module.exports.getUser = (req, res, next) => {
 module.exports.getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
-    .orFail(new Error('NotValidId'))
+    .orFail(() => new NotFoundError('Текущий пользователь не найден.'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный id пользователя'));
       }
-      if (err.message === 'NotValidId') {
-        next(new NotFoundError('Текущий пользователь не найден.'));
-      }
+
       next(err);
     });
 };
@@ -90,14 +86,11 @@ module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   const userId = req.user._id;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true, upsert: false })
-    .orFail(new Error('NotValidId'))
+    .orFail(() => new NotFoundError('Пользователь по указанному _id не найден.'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректный id пользователя'));
-      }
-      if (err.message === 'NotValidId') {
-        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       }
       next(err);
     });
@@ -108,15 +101,13 @@ module.exports.updateAvatar = (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
   User.findByIdAndUpdate(userId, { avatar }, { new: true })
-    .orFail(new Error('NotValidId'))
+    .orFail(() => new NotFoundError('Пользователь по указанному _id не найден.'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректный id пользователя'));
       }
-      if (err.message === 'NotValidId') {
-        next(new NotFoundError('Пользователь по указанному _id не найден.'));
-      }
+
       next(err);
     });
 };

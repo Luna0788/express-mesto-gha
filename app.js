@@ -19,11 +19,14 @@ mongoose.connect(DB_URL);
 app.get('/signout', logout);
 app.post('/signin', validationLogin, login);
 app.post('/signup', validationCreateUser, createUser);
+
+app.use(auth);
+app.use(router);
+
 app.use('/', (req, res, next) => {
   next(new NotFoundError('Такой страницы не существует'));
 });
-app.use(auth);
-app.use(router);
+
 app.use(errors());
 
 app.use(error);
