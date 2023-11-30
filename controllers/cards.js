@@ -23,10 +23,8 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.status(CREATED_CODE).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
         next(new BadRequestError('Некорректные данные при создании карточки'));
       }
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
       next(err);
     });
 };
@@ -39,8 +37,6 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(new Error('NotValidId'))
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
-        // return res.status(UNAUTHORIZED_CODE)
-        // .send({ message: 'Невозможно удалить чужую карточку' });
         return next(new ForbiddenError('Невозможно удалить чужую карточку'));
       }
       return card.deleteOne()
@@ -48,15 +44,11 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
         next(new BadRequestError('Некорректный id карточки'));
       }
       if (err.message === 'NotValidId') {
-        // return res.status(NOT_FOUND_CODE)
-        // .send({ message: 'Карточка с указанным _id не найдена.' });
         next(new NotFoundError('Карточка с указанным _id не найдена.'));
       }
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
       next(err);
     });
 };
@@ -74,15 +66,11 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
         next(new BadRequestError('Некорректный id карточки'));
       }
       if (err.message === 'NotValidId') {
-        // return res.status(NOT_FOUND_CODE)
-        // .send({ message: 'Передан несуществующий _id карточки.' });
         next(new NotFoundError('Карточка с указанным _id не найдена.'));
       }
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
       next(err);
     });
 };
@@ -100,15 +88,11 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
         next(new BadRequestError('Некорректный id карточки'));
       }
       if (err.message === 'NotValidId') {
-        // return res.status(NOT_FOUND_CODE)
-        // .send({ message: 'Передан несуществующий _id карточки.' });
         next(new NotFoundError('Передан несуществующий _id карточки.'));
       }
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
       next(err);
     });
 };

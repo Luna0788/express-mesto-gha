@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
-// const AuthError = require('../errors/AuthError');
 const ConflictError = require('../errors/ConflictError');
 
 const {
@@ -39,10 +38,8 @@ module.exports.createUser = (req, res, next) => {
       }
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Некорректные данные пользователя'));
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
       }
       return next(err);
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
     });
 };
 
@@ -50,7 +47,6 @@ module.exports.createUser = (req, res, next) => {
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    // .catch(() => res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' }));
     .catch(next);
 };
 
@@ -63,15 +59,11 @@ module.exports.getUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
         next(new BadRequestError('Некорректный id пользователя.'));
       }
       if (err.message === 'NotValidId') {
-      // return res.status(NOT_FOUND_CODE)
-      // .send({ message: 'Пользователь по указанному _id не найден.' });
         next(new NotFoundError('Пользователь по указанному _id не найден.'));
       }
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
       next(err);
     });
 };
@@ -79,21 +71,16 @@ module.exports.getUser = (req, res, next) => {
 // get current user
 module.exports.getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
-  // console.log('req.user', req.user);
-  // console.log('userId', userId);
   User.findById(userId)
     .orFail(new Error('NotValidId'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
         next(new BadRequestError('Некорректный id пользователя'));
       }
       if (err.message === 'NotValidId') {
-      //   return res.status(NOT_FOUND_CODE).send({ message: 'Текущий пользователь не найден.' });
         next(new NotFoundError('Текущий пользователь не найден.'));
       }
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
       next(err);
     });
 };
@@ -107,15 +94,11 @@ module.exports.updateUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
         next(new BadRequestError('Некорректный id пользователя'));
       }
       if (err.message === 'NotValidId') {
-      //   return res.status(NOT_FOUND_CODE)
-      // .send({ message: 'Пользователь по указанному _id не найден.' });
         next(new NotFoundError('Пользователь по указанному _id не найден.'));
       }
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
       next(err);
     });
 };
@@ -129,15 +112,11 @@ module.exports.updateAvatar = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        // return res.status(BAD_REQUEST_CODE).send({ message: err.message });
         next(new BadRequestError('Некорректный id пользователя'));
       }
       if (err.message === 'NotValidId') {
-      //   return res.status(NOT_FOUND_CODE)
-      // .send({ message: 'Пользователь по указанному _id не найден.' });
         next(new NotFoundError('Пользователь по указанному _id не найден.'));
       }
-      // return res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: 'Ошибка сервера.' });
       next(err);
     });
 };
