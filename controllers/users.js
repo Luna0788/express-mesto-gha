@@ -131,3 +131,8 @@ module.exports.login = (req, res, next) => {
     })
     .catch(next);
 };
+
+// logout
+module.exports.logout = (req, res) => {
+  res.clearCookie('token').send({ message: 'Выход' });
+};
