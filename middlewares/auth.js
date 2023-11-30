@@ -23,6 +23,5 @@ module.exports = (req, res, next) => {
   }
 
   req.user = payload;
-  req.user._id = jwt.decode(token, 'some-secret-key');
   next();
 };

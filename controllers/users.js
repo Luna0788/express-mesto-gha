@@ -78,8 +78,9 @@ module.exports.getUser = (req, res, next) => {
 
 // get current user
 module.exports.getCurrentUser = (req, res, next) => {
-  const { userId } = req.user._id;
-  console.log(userId);
+  const userId = req.user._id;
+  // console.log('req.user', req.user);
+  // console.log('userId', userId);
   User.findById(userId)
     .orFail(new Error('NotValidId'))
     .then((user) => res.send({ data: user }))
