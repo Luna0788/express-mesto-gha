@@ -34,6 +34,7 @@ module.exports.createCard = (req, res, next) => {
 // delete card by id
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
+
   Card.findById(cardId)
     .orFail(new Error('NotValidId'))
     .then((card) => {
@@ -42,7 +43,7 @@ module.exports.deleteCard = (req, res, next) => {
         // .send({ message: 'Невозможно удалить чужую карточку' });
         return next(new ForbiddenError('Невозможно удалить чужую карточку'));
       }
-      return card.remove()
+      return card.deleteOne()
         .then(() => res.send({ message: 'Карточка удалена' }));
     })
     .catch((err) => {
